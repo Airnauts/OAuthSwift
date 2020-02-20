@@ -354,7 +354,7 @@ extension OAuthSwiftHTTPRequest {
         }
 
         /// Modify request with authentification
-        public mutating func updateRequest(credential: OAuthSwiftCredential) {
+        public mutating func updateRequest(credential: OAuthSwiftCredential, additionalAuthParameters: OAuthSwift.Parameters = [:]) {
             let method = self.httpMethod
             let url = self.urlRequest.url!
             let headers: OAuthSwift.Headers = self.urlRequest.allHTTPHeaderFields ?? [:]
@@ -418,6 +418,8 @@ extension OAuthSwiftHTTPRequest {
                 self.parameters += credential.authorizationParametersWithSignature(method: method, url: signatureUrl, parameters: signatureParameters, body: body)
             }
 
+            requestHeaders = credential.updateHeaders(headers, additionalAuthParameters: additionalAuthParameters)
+  
             self.urlRequest.allHTTPHeaderFields = requestHeaders + headers
         }
 

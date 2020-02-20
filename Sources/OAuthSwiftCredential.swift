@@ -307,6 +307,32 @@ open class OAuthSwiftCredential: NSObject, NSSecureCoding, Codable {
         }
     }
 
+    internal func updateHeaders(_ headers: [String: String], additionalAuthParameters: OAuthSwift.Parameters) -> [String: String] {
+        switch self.version {
+        case .oauth1:
+            guard var newValue = headers["Authorization"] else {
+                return headers
+            }
+            let additionalAuthParametersString = additionalAuthParameters.reduce("") { (result, dict) -> String in
+                  var newString = result
+                  let (key, value) = dict
+                  newString = result + ", " + key + "="
+                  if let value = value as? String {
+                       newString =  newString + "\"" + value + "\""
+                  } else {
+                      newString =  newString + "\"\""
+                  }
+                  return result
+              }
+             newValue = newValue + additionalAuthParametersString
+            var newHeaders = headers
+            newHeaders["Authorization"] = newValue
+            return newHeaders
+        case .oauth2:
+            return headers
+        }
+    }
+
     open func authorizationHeader(method: OAuthSwiftHTTPRequest.Method, url: URL, parameters: OAuthSwift.Parameters, body: Data? = nil) -> String {
         let timestamp = String(Int64(Date().timeIntervalSince1970))
         let nonce = OAuthSwiftCredential.generateNonce()

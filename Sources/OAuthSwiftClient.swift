@@ -45,32 +45,32 @@ open class OAuthSwiftClient: NSObject {
 
     // MARK: client methods
     @discardableResult
-    open func get(_ url: URLConvertible, parameters: OAuthSwift.Parameters = [:], headers: OAuthSwift.Headers? = nil, completionHandler completion: OAuthSwiftHTTPRequest.CompletionHandler?) -> OAuthSwiftRequestHandle? {
-        return self.request(url, method: .GET, parameters: parameters, headers: headers, completionHandler: completion)
+    open func get(_ url: URLConvertible, parameters: OAuthSwift.Parameters = [:], authorizationParameters: OAuthSwift.Parameters = [:], headers: OAuthSwift.Headers? = nil, completionHandler completion: OAuthSwiftHTTPRequest.CompletionHandler?) -> OAuthSwiftRequestHandle? {
+        return self.request(url, method: .GET, parameters: parameters, authorizationParameters: authorizationParameters, headers: headers, completionHandler: completion)
     }
 
     @discardableResult
-    open func post(_ url: URLConvertible, parameters: OAuthSwift.Parameters = [:], headers: OAuthSwift.Headers? = nil, body: Data? = nil, completionHandler completion: OAuthSwiftHTTPRequest.CompletionHandler?) -> OAuthSwiftRequestHandle? {
-        return self.request(url, method: .POST, parameters: parameters, headers: headers, body: body, completionHandler: completion)
+    open func post(_ url: URLConvertible, parameters: OAuthSwift.Parameters = [:], authorizationParameters: OAuthSwift.Parameters = [:], headers: OAuthSwift.Headers? = nil, body: Data? = nil, completionHandler completion: OAuthSwiftHTTPRequest.CompletionHandler?) -> OAuthSwiftRequestHandle? {
+        return self.request(url, method: .POST, parameters: parameters, authorizationParameters: authorizationParameters, headers: headers, body: body, completionHandler: completion)
     }
 
     @discardableResult
-    open func put(_ url: URLConvertible, parameters: OAuthSwift.Parameters = [:], headers: OAuthSwift.Headers? = nil, body: Data? = nil, completionHandler completion: OAuthSwiftHTTPRequest.CompletionHandler?) -> OAuthSwiftRequestHandle? {
-        return self.request(url, method: .PUT, parameters: parameters, headers: headers, body: body, completionHandler: completion)
+    open func put(_ url: URLConvertible, parameters: OAuthSwift.Parameters = [:], authorizationParameters: OAuthSwift.Parameters = [:], headers: OAuthSwift.Headers? = nil, body: Data? = nil, completionHandler completion: OAuthSwiftHTTPRequest.CompletionHandler?) -> OAuthSwiftRequestHandle? {
+        return self.request(url, method: .PUT, parameters: parameters, authorizationParameters: authorizationParameters, headers: headers, body: body, completionHandler: completion)
     }
 
     @discardableResult
-    open func delete(_ url: URLConvertible, parameters: OAuthSwift.Parameters = [:], headers: OAuthSwift.Headers? = nil, completionHandler completion: OAuthSwiftHTTPRequest.CompletionHandler?) -> OAuthSwiftRequestHandle? {
-        return self.request(url, method: .DELETE, parameters: parameters, headers: headers, completionHandler: completion)
+    open func delete(_ url: URLConvertible, parameters: OAuthSwift.Parameters = [:], authorizationParameters: OAuthSwift.Parameters = [:], headers: OAuthSwift.Headers? = nil, completionHandler completion: OAuthSwiftHTTPRequest.CompletionHandler?) -> OAuthSwiftRequestHandle? {
+        return self.request(url, method: .DELETE, parameters: parameters, authorizationParameters: authorizationParameters, headers: headers, completionHandler: completion)
     }
 
     @discardableResult
-    open func patch(_ url: URLConvertible, parameters: OAuthSwift.Parameters = [:], headers: OAuthSwift.Headers? = nil, completionHandler completion: OAuthSwiftHTTPRequest.CompletionHandler?) -> OAuthSwiftRequestHandle? {
-        return self.request(url, method: .PATCH, parameters: parameters, headers: headers, completionHandler: completion)
+    open func patch(_ url: URLConvertible, parameters: OAuthSwift.Parameters = [:], authorizationParameters: OAuthSwift.Parameters = [:], headers: OAuthSwift.Headers? = nil, completionHandler completion: OAuthSwiftHTTPRequest.CompletionHandler?) -> OAuthSwiftRequestHandle? {
+        return self.request(url, method: .PATCH, parameters: parameters, authorizationParameters: authorizationParameters, headers: headers, completionHandler: completion)
     }
 
     @discardableResult
-    open func request(_ url: URLConvertible, method: OAuthSwiftHTTPRequest.Method, parameters: OAuthSwift.Parameters = [:], headers: OAuthSwift.Headers? = nil, body: Data? = nil, checkTokenExpiration: Bool = true, completionHandler completion: OAuthSwiftHTTPRequest.CompletionHandler?) -> OAuthSwiftRequestHandle? {
+    open func request(_ url: URLConvertible, method: OAuthSwiftHTTPRequest.Method, parameters: OAuthSwift.Parameters = [:], authorizationParameters: OAuthSwift.Parameters = [:], headers: OAuthSwift.Headers? = nil, body: Data? = nil, checkTokenExpiration: Bool = true, completionHandler completion: OAuthSwiftHTTPRequest.CompletionHandler?) -> OAuthSwiftRequestHandle? {
 
         if checkTokenExpiration && self.credential.isTokenExpired() {
             completion?(.failure(.tokenExpired(error: nil)))
@@ -95,13 +95,13 @@ open class OAuthSwiftClient: NSObject {
         return request
     }
 
-    open func makeRequest(_ url: URLConvertible, method: OAuthSwiftHTTPRequest.Method, parameters: OAuthSwift.Parameters = [:], headers: OAuthSwift.Headers? = nil, body: Data? = nil) -> OAuthSwiftHTTPRequest? {
+    open func makeRequest(_ url: URLConvertible, method: OAuthSwiftHTTPRequest.Method, parameters: OAuthSwift.Parameters = [:], authorizationParameters: OAuthSwift.Parameters = [:], headers: OAuthSwift.Headers? = nil, body: Data? = nil) -> OAuthSwiftHTTPRequest? {
         guard let url = url.url else {
             return nil // XXX failure not thrown here
         }
 
         let request = OAuthSwiftHTTPRequest(url: url, method: method, parameters: parameters, paramsLocation: self.paramsLocation, httpBody: body, headers: headers ?? [:], sessionFactory: self.sessionFactory)
-        request.config.updateRequest(credential: self.credential)
+        request.config.updateRequest(credential: self.credential, additionalAuthParameters: authorizationParameters)
         return request
     }
 
