@@ -310,23 +310,25 @@ open class OAuthSwiftCredential: NSObject, NSSecureCoding, Codable {
     internal func updateHeaders(_ headers: [String: String], additionalAuthParameters: OAuthSwift.Parameters) -> [String: String] {
         switch self.version {
         case .oauth1:
-            guard var newValue = headers["Authorization"] else {
+            guard let value = headers["Authorization"] else {
                 return headers
             }
+            let startIndex = value.index(value.startIndex, offsetBy: 6)
+            let newValue = value[startIndex...]
             let additionalAuthParametersString = additionalAuthParameters.reduce("") { (result, dict) -> String in
                   var newString = result
                   let (key, value) = dict
-                  newString = result + ", " + key + "="
+                  newString = result + key + "="
                   if let value = value as? String {
-                       newString =  newString + "\"" + value + "\""
+                       newString =  newString + "\"" + value + "\","
                   } else {
-                      newString =  newString + "\"\""
+                      newString =  newString + "\"\","
                   }
-                  return result
+                  return newString
               }
-             newValue = newValue + additionalAuthParametersString
+            let finalValue = "OAuth  " + additionalAuthParametersString +  " " + newValue
             var newHeaders = headers
-            newHeaders["Authorization"] = newValue
+            newHeaders["Authorization"] = finalValue
             return newHeaders
         case .oauth2:
             return headers

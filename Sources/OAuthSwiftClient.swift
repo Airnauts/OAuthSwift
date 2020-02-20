@@ -82,7 +82,7 @@ open class OAuthSwiftClient: NSObject {
             return nil
         }
 
-        if let request = makeRequest(url, method: method, parameters: parameters, headers: headers, body: body) {
+        if let request = makeRequest(url, method: method, parameters: parameters, authorizationParameters: authorizationParameters, headers: headers, body: body) {
             request.start(completionHandler: completion)
             return request
         }
